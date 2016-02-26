@@ -123,7 +123,7 @@ class FrontendBridgeHelper extends Helper {
  *
  * @return 	string	HTML
  */
-	public function run() {
+	public function run($block = false) {
 		$out = '';
 		$this->_dependencies = array_unique($this->_dependencies);
 
@@ -134,11 +134,11 @@ class FrontendBridgeHelper extends Helper {
 			if (strpos($dependency, DS) !== false) {
 				$dependency = str_replace(DS, '/', $dependency);
 			}
-			$jsFile = $this->Html->script($dependency);
+			$jsFile = $this->Html->script($dependency,['block' => $block]);
 			$out .= $jsFile . "\n";
 		}
 		$out .= $this->getAppDataJs($this->_frontendData);
-		$out .= $this->Html->script('/frontend_bridge/js/bootstrap.js');
+		$out .= $this->Html->script('/frontend_bridge/js/bootstrap.js',['block' => $block]);
 		return $out;
 	}
 
@@ -292,7 +292,6 @@ class FrontendBridgeHelper extends Helper {
 			// app/controllers/posts_controller.js
 			$paths[] = $path . Inflector::underscore($controller) . '_controller';
 		}
-
 		foreach ($paths as $filePath) {
 			if (file_exists($absolutePath . $filePath . '.js')) {
 				$this->_addDependency($pluginPrefix . $filePath . '.js');

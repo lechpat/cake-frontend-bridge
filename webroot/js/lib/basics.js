@@ -322,6 +322,14 @@ var guid = (function() {
   };
 })();
 
+var extract = function(array, attr, value) {
+    for(var i = 0; i < array.length; i++) {
+        if(array[i][attr] == value) {
+            return array[i];
+        }
+    }
+    return null;
+}
 
 if (!window.console) {
 	var names = ["log", "debug", "info", "warn", "error",
