@@ -40,7 +40,7 @@ Frontend.Controller = Class.extend({
 		this.name = this._frontendData.request.controller;
 		this.action = this._frontendData.request.action;
 
-		var selector = 'div.controller.' + this._frontendData.request.controller + '-' + stringUnderscore(this._frontendData.request.action);
+		var selector = '.controller.' + this._frontendData.request.controller + '-' + stringUnderscore(this._frontendData.request.action);
 		this._dom = $(selector);
 		this.$ = this._dom.find.bind(this._dom);
 
