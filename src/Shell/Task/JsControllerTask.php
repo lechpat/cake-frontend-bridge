@@ -27,12 +27,29 @@ class JsControllerTask extends BakeTask
         $controllerName = Inflector::camelize($this->args[0]);
         $actionName = Inflector::camelize($this->args[1]);
         $this->plugin = isset($this->params['plugin']) ? $this->params['plugin'] : null;
-
+        $prefix = $this->_getPrefix();
+        if ($prefix) {
+            $prefix = str_replace('/', '\\', $prefix);
+        }
+        $this->BakeTemplate->set('prefix', $prefix);
         $this->BakeTemplate->set('controllerName', $controllerName);
         $this->BakeTemplate->set('actionName', $actionName);
         $content = $this->BakeTemplate->generate('FrontendBridge.webroot/js_controller');
 
-        $this->bake($controllerName, $actionName, $content);
+        $this->bake($prefix, $controllerName, $actionName, $content);
+    }
+
+    public function getPath()
+    {
+        $path = APP . $this->pathFragment;
+        if (isset($this->plugin)) {
+            $path = $this->_pluginPath($this->plugin) . 'src/' . $this->pathFragment;
+        }
+        $prefix = $this->_getPrefix();
+        if ($prefix) {
+            $path .= Inflector::underscore($prefix) . DS;
+        }
+        return str_replace('/', DS, $path);
     }
 
     /**
@@ -43,7 +60,7 @@ class JsControllerTask extends BakeTask
      * @param string $content File Content
      * @return string
      */
-    public function bake($controllerName, $actionName, $content = '')
+    public function bake($prefix, $controllerName, $actionName, $content = '')
     {
         if ($content === true) {
             $content = $this->getContent($action);
@@ -75,6 +92,8 @@ class JsControllerTask extends BakeTask
         ])->addArgument('action', [
             'help' => 'Action Name, e.g. addPost',
             'required' => true
+        ])->addOption('prefix', [
+            'help' => 'The namespace/routing prefix to use.'
         ]);
         return $parser;
     }
