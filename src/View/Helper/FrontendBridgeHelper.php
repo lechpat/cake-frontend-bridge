@@ -163,6 +163,7 @@ class FrontendBridgeHelper extends Helper {
  * @return void
  */
 	protected function _addCurrentController() {
+        $this->addController(Inflector::camelize($this->_frontendData['request']['prefix']) . '.' . Inflector::camelize($this->_frontendData['request']['controller']) . '.' . Inflector::camelize($this->_frontendData['request']['action']));
 		$this->addController(Inflector::camelize($this->_frontendData['request']['controller']) . '.' . Inflector::camelize($this->_frontendData['request']['action']));
 		$this->addController(Inflector::camelize($this->_frontendData['request']['controller']));
 	}
@@ -238,6 +239,7 @@ class FrontendBridgeHelper extends Helper {
 		}
 
 		$split = explode('.', $controllerName);
+        
 		$controller = $split[0];
 		$action = null;
 		if (isset($split[1])) {
@@ -256,6 +258,10 @@ class FrontendBridgeHelper extends Helper {
 
 		$paths = array();
 		$path = 'app/controllers/';
+
+        if(!empty($this->request->prefix)) {
+            $path .= $this->request->prefix . '/';
+        }
 
 		if ($controller && $action == '*') {
 			// add the base controller

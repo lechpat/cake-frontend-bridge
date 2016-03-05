@@ -142,6 +142,7 @@ class FrontendBridgeComponent extends Component {
 				'pass' => $this->_controller->request->params['pass'],
                 'prefix' => $this->_controller->request->prefix,
 				'plugin' => $this->_controller->request->plugin,
+                'prefix' => $this->_controller->request->prefix,
 				'controller' => Inflector::underscore($this->_controller->name),
 				'action' => $this->_controller->request->action
 			),
