@@ -7,8 +7,8 @@ Frontend.Router = Class.extend({
 	urlDefaults: {
 		controller: null,
 		action: null,
-		pass: [],
-		query: {},
+		pass: null,
+		query: null,
 		prefix: '',
 		plugin: null
 	},
@@ -24,6 +24,7 @@ Frontend.Router = Class.extend({
 		this.action = appData.action;
 		this.named = appData.named;
 		this.currentUrl = appData.url;
+    this.urlDefaults = appData.request;
 	},
 	/**
 	 * Constructs an url based on the given parameters.
@@ -48,22 +49,28 @@ Frontend.Router = Class.extend({
 			var query = params.query;
 			var plugin = params.plugin;
 		}
-		
+
 		if(plugin) {
 			plugin = plugin.toLowerCase() + '/';
 		} else {
 			plugin = '';
 		}
-		
-		var url = this.webroot + prefix + plugin + controller + '/' + action + '/';
+
+    if(prefix) {
+      prefix = prefix.toLowerCase() + '/';
+    } else {
+      prefix = '';
+    }	  
+	
+		var url = this.webroot + prefix + plugin + controller + '/' + action ;
 
 		if(pass instanceof Array) {
 			$.each(pass, function (i, val) {
-				url += val + '/';
+				url += '/' + val;
 			});
 		}
 		
-		if(typeof query == 'object') {
+		if(typeof query == 'object' && !jQuery.isEmptyObject(query)) {
 			url += '?' + http_build_query(query);
 		}
 		return url;
