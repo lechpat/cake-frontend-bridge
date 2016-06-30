@@ -52,6 +52,13 @@ class FrontendBridgeHelper extends Helper {
 	protected $_pluginJsNamespaces = [];
 
 /**
+ * True if functionality is used for the AssetCompress plugin
+ *
+ * @var bool
+ */
+	protected $_assetCompressMode = false;
+
+/**
  * Initialize the helper. Needs to be called before running it.
  *
  * @param array $frontendData Data to be passed to the frontend
@@ -109,11 +116,13 @@ class FrontendBridgeHelper extends Helper {
  * @return array
  */
 	public function compileDependencies($defaultControllers = array()) {
+		$this->_assetCompressMode = true;
 		$this->_includeAppController();
 		$this->_includeComponents();
 		$this->addController($defaultControllers);
 		$this->addAllControllers();
 		$this->_dependencies[] = '/frontend_bridge/js/bootstrap.js';
+		$this->_assetCompressMode = false;
 		return array_unique($this->_dependencies);
 	}
 
@@ -170,8 +179,8 @@ class FrontendBridgeHelper extends Helper {
 
 /**
  * Adds all controllers in app/controllers to the dependencies.
- * 
- * Please use only in development model.
+ *
+ * Please use only in development mode!
  *
  * @return void
  */
@@ -195,10 +204,15 @@ class FrontendBridgeHelper extends Helper {
 				$this->_pluginJsNamespaces[] = $pluginName;
 				$folder = new \Cake\Filesystem\Folder($pluginJsControllersFolder);
 				$files = $folder->findRecursive('.*\.js');
+
 				foreach ($files as $file) {
 					$file = str_replace('\\', '/', $file);
 					$file = str_replace($pluginJsControllersFolder, '', $file);
-					$controllers[] = '/' . Inflector::underscore($pluginName) . '/js/app/controllers/' . $file;
+					if ($this->_assetCompressMode) {
+						$controllers[] = 'plugin:' . $pluginName . ':js/app/controllers/' . $file;
+					} else {
+						$controllers[] = '/' . Inflector::underscore($pluginName) . '/js/app/controllers/' . $file;
+					}
 				}
 			}
 		}
@@ -218,7 +232,7 @@ class FrontendBridgeHelper extends Helper {
 
 /**
  * Include one or more JS controllers. Supports the 2 different file/folder structures.
- * 
+ *
  * - app/controllers/posts_edit_permissions_controller.js
  * - app/controllers/posts/edit_permissions_controller.js
  * - app/controllers/posts_controller.js
@@ -227,7 +241,7 @@ class FrontendBridgeHelper extends Helper {
  * @param string|array $controllerName Dot-separated controller, TitleCased name.
  * 										Posts.EditPermissions
  * 										Posts.* (include all)
- * 										
+ *
  * @return bool
  */
 	public function addController($controllerName) {
@@ -308,7 +322,7 @@ class FrontendBridgeHelper extends Helper {
 	}
 
 /**
- * Include one or more JS components 
+ * Include one or more JS components
  *
  * @param string|array $componentName CamelCased component name	(e.g. SelectorAddressList)
  * @return bool
